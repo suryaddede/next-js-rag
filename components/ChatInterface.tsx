@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
+import { useChat } from '@ai-sdk/react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import ChatBubble, { type ChatMessage } from '@/components/ChatBubble';
@@ -8,48 +9,45 @@ import { cn } from '@/lib/utils';
 import { Send } from 'lucide-react';
 
 interface ChatInterfaceProps {
-  initialMessages?: ChatMessage[];
-  onSendMessage: (message: string) => void;
-  isLoading?: boolean;
   className?: string;
 }
 
-export default function ChatInterface({
-  initialMessages = [],
-  onSendMessage,
-  isLoading = false,
-  className,
-}: ChatInterfaceProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [input, setInput] = useState('');
+export default function ChatInterface({ className }: ChatInterfaceProps) {
+  // Use the Vercel AI SDK useChat hook inside the component
+  const {
+    messages: aiMessages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    status,
+  } = useChat();
+
+  // Transform AI SDK messages to our ChatMessage format
+  const initialMessages: ChatMessage[] = aiMessages.map((msg) => ({
+    id: msg.id,
+    content: msg.content,
+    role: msg.role as 'user' | 'assistant',
+    createdAt: new Date(),
+  }));
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Update messages when initialMessages changes
-  useEffect(() => {
-    setMessages(initialMessages);
-  }, [initialMessages]);
+  // Check if the chat is currently in a loading state
+  const isProcessing = status === 'streaming' || status === 'submitted';
 
-  // Scroll to bottom when messages or loading state changes
+  // Scroll to bottom when messages or status changes
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]);
+  }, [initialMessages, status]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSendMessage = () => {
-    if (!input.trim() || isLoading) return;
-
-    // Call the parent handler with the message content
-    onSendMessage(input);
-    setInput('');
-  };
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
     }
   };
 
@@ -63,7 +61,7 @@ export default function ChatInterface({
     >
       {/* Messages Area */}
       <div className="flex-1 space-y-1 overflow-y-auto p-4 pb-0">
-        {messages.length === 0 ? (
+        {initialMessages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center">
             <div className="max-w-sm text-center">
               <h2 className="mb-2 text-xl font-semibold">
@@ -76,62 +74,34 @@ export default function ChatInterface({
             </div>
           </div>
         ) : (
-          messages.map((message, index) => (
-            <ChatBubble
-              key={message.id}
-              message={message}
-              isLoading={
-                isLoading &&
-                index === messages.length - 1 &&
-                message.role === 'assistant'
-              }
-            />
+          initialMessages.map((message) => (
+            <ChatBubble key={message.id} message={message} />
           ))
-        )}
-
-        {/* Show loading indicator when waiting for the first response */}
-        {isLoading && messages.length === 0 && (
-          <ChatBubble
-            message={{
-              id: 'loading',
-              content: '',
-              role: 'assistant',
-            }}
-            isLoading={true}
-          />
         )}
 
         {/* Scroll anchor */}
         <div ref={messagesEndRef} />
-      </div>{' '}
+      </div>
       {/* Input Area */}
       <div className="bg-background/50 border-t p-4 backdrop-blur-sm">
-        {' '}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendMessage();
-          }}
-          className="flex items-center gap-2"
-        >
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <div className="relative flex-1">
-            {' '}
             <Textarea
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
               className="bg-background/50 focus-visible:border-ring max-h-[200px] min-h-[60px] w-full resize-none overflow-y-auto break-words whitespace-pre-wrap"
               rows={3}
               autoFocus
-              disabled={isLoading}
+              disabled={isProcessing}
             />
           </div>
           <Button
             type="submit"
             size="icon"
             className="h-10 w-10 shrink-0"
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() || isProcessing}
           >
             <Send className="h-4 w-4" />
             <span className="sr-only">Send</span>

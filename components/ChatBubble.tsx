@@ -1,9 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { memo, lazy, Suspense } from 'react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Bot, User } from 'lucide-react';
+
+// Lazy load ReactMarkdown to improve performance
+const ReactMarkdown = lazy(() => import('react-markdown'));
 
 export interface ChatMessage {
   id: string;
@@ -14,16 +17,41 @@ export interface ChatMessage {
 
 interface ChatBubbleProps {
   message: ChatMessage;
-  isLoading?: boolean;
   className?: string;
 }
 
-export default function ChatBubble({
-  message,
-  isLoading = false,
-  className,
-}: ChatBubbleProps) {
+function ChatBubble({ message, className }: ChatBubbleProps) {
   const isUser = message.role === 'user';
+
+  // Simple content (no need for markdown) for user messages to improve performance
+  const renderContent = () => {
+    if (isUser || !message.content) {
+      return (
+        <p className="text-sm leading-relaxed whitespace-pre-wrap">
+          {message.content}
+        </p>
+      );
+    }
+
+    // Only use markdown for assistant messages with content
+    if (message.content) {
+      return (
+        <Suspense
+          fallback={
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+              {message.content}
+            </p>
+          }
+        >
+          <div className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed">
+            <ReactMarkdown>{message.content}</ReactMarkdown>
+          </div>
+        </Suspense>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <div
@@ -49,26 +77,7 @@ export default function ChatBubble({
             : 'bg-muted text-foreground'
         )}
       >
-        <p className="text-sm leading-relaxed whitespace-pre-wrap">
-          {message.content}
-        </p>
-
-        {isLoading && message.role === 'assistant' && (
-          <div className="mt-2 flex items-center gap-1">
-            <span
-              className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-75"
-              style={{ animationDelay: '0ms' }}
-            ></span>
-            <span
-              className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-75"
-              style={{ animationDelay: '150ms' }}
-            ></span>
-            <span
-              className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-75"
-              style={{ animationDelay: '300ms' }}
-            ></span>
-          </div>
-        )}
+        {renderContent()}
       </div>
 
       {isUser && (
@@ -81,3 +90,12 @@ export default function ChatBubble({
     </div>
   );
 }
+
+// Memoize the component to prevent unnecessary re-renders
+// with custom equality check to prevent re-rendering when message content hasn't changed
+export default memo(ChatBubble, (prevProps, nextProps) => {
+  return (
+    prevProps.message.content === nextProps.message.content &&
+    prevProps.message.role === nextProps.message.role
+  );
+});
