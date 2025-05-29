@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import ChatBubble, { type ChatMessage } from '@/components/ChatBubble';
 import { cn } from '@/lib/utils';
+import { KeyboardReturn } from '@mui/icons-material';
 import { Send } from 'lucide-react';
 
 interface ChatInterfaceProps {
@@ -45,7 +46,7 @@ export default function ChatInterface({ className }: ChatInterfaceProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && e.ctrlKey) {
       e.preventDefault();
       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
     }
@@ -99,12 +100,12 @@ export default function ChatInterface({ className }: ChatInterfaceProps) {
           </div>
           <Button
             type="submit"
-            size="icon"
-            className="h-10 w-10 shrink-0"
+            className="h-15 w-30 gap-0"
             disabled={!input.trim() || isProcessing}
           >
-            <Send className="h-4 w-4" />
-            <span className="sr-only">Send</span>
+            <Send className="mr-3 h-4 w-4" />
+            <span>Ctrl</span>
+            <KeyboardReturn className="h-4 w-4" />
           </Button>
         </form>
       </div>
