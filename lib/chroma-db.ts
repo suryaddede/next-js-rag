@@ -15,13 +15,16 @@ import { ChromaClient, VoyageAIEmbeddingFunction } from 'chromadb';
  */
 export type DocumentMetadata = {
   title: string;
+  content_type: string;
   source_url: string;
 };
 
 /**
  * ChromaDB client instance for interacting with the vector database
  */
-const client = new ChromaClient();
+const client = new ChromaClient({
+  path: 'http://localhost:8000',
+});
 
 /**
  * Embedding function that converts text to vector representations using Voyage AI
@@ -49,6 +52,27 @@ const collection = client
   .catch((error) => {
     throw new Error('Failed to initialize ChromaDB collection', error);
   });
+
+/**
+ * Retrieves documents from the collection
+ *
+ * @param limit - Optional maximum number of documents to return (default: undefined, returns all documents)
+ * @returns Promise that resolves to an object containing documents, their metadata, and IDs
+ * @throws Error if the operation fails
+ */
+export async function getDocuments(limit?: number) {
+  try {
+    const result = await (
+      await collection
+    ).get({
+      limit: limit,
+    });
+    return result;
+  } catch (error) {
+    console.error('Error retrieving documents:', error);
+    throw new Error('Failed to retrieve documents from the collection');
+  }
+}
 
 /**
  * Adds or updates a document in the vector database
@@ -103,7 +127,7 @@ export async function deleteDocument(id: string) {
  *          their metadata, and relevance scores
  * @throws Error if the operation fails
  */
-export async function queryDocument(query: string, limit: number = 5) {
+export async function queryDocument(query: string, limit: number = 12) {
   try {
     const results = await (
       await collection

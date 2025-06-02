@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  chromadb:
+    image: chromadb/chroma:latest
+    volumes:
+      # Persist the database data on disk
+      - ./chroma_data:/chroma/chroma
+    environment:
+      # Environment variables for configuring Chroma
+      - ALLOW_RESET=true
+      - ANONYMIZED_TELEMETRY=false
+      - CHROMA_SERVER_AUTH_CREDENTIALS_PROVIDER=chromadb.auth.token.TokenAuthServerProvider
+      - CHROMA_SERVER_AUTH_CREDENTIALS=admin:admin
+      - CHROMA_SERVER_AUTH_PROVIDER=token
+      # You can add other environment variables as needed
+    ports:
+      # Map container port 8000 to host port 8000
+      - "8000:8000"
+    restart: unless-stopped
