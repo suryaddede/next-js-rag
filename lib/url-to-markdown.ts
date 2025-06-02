@@ -8,7 +8,7 @@ type ContentMap = Record<ContentType, string>;
 
 export type UserContent = Array<
   | { type: 'text'; text: string }
-  | { type: 'file'; mimeType: string; data: ArrayBuffer | string /* URL */ }
+  | { type: 'file'; mimeType: string; data: string }
 >;
 
 // Configuration constants
