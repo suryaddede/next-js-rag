@@ -1,6 +1,7 @@
 import { google, GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
 import { generateText } from 'ai';
 import * as cheerio from 'cheerio';
+import { getCurrentTimestamp } from './utils';
 
 // Define content types and interfaces
 export type ContentType = 'pdf' | 'json' | 'html';
@@ -145,6 +146,8 @@ export interface MarkdownResult {
   sourceUrl: string;
   /** The type of the content that was converted */
   contentType: ContentType;
+  /** The timestamp of when the content was last fetched/converted */
+  last_update: string;
 }
 
 /**
@@ -178,17 +181,23 @@ export async function convertToMarkdown(url: string): Promise<MarkdownResult> {
     providerOptions: {
       google: {
         responseModalities: ['TEXT'],
-        thinkingConfig: {
-          thinkingBudget: 0,
-        },
+        // Only apply thinking config for non-PDF content types
+        ...(contentType !== 'pdf' && {
+          thinkingConfig: {
+            thinkingBudget: 0,
+          },
+        }),
       } satisfies GoogleGenerativeAIProviderOptions,
     },
   });
 
+  const lastUpdate = getCurrentTimestamp();
+
   return {
     markdown: text,
     sourceUrl: resolvedUrl,
-    contentType,
+    contentType: contentType,
+    last_update: lastUpdate,
   };
 }
 

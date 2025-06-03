@@ -1,3 +1,5 @@
+'use server';
+
 /**
  * ChromaDB Vector Database Integration
  *
@@ -17,6 +19,7 @@ export type DocumentMetadata = {
   title: string;
   content_type: string;
   source_url: string;
+  last_update: string;
 };
 
 /**
