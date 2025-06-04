@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, MoreHorizontal } from 'lucide-react';
+import { FileText, MoreHorizontal, Trash2, Edit, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +20,7 @@ export type DocumentType = {
   type: string;
   size: string;
   updated: string;
+  url?: string; // Added for document source URL
 };
 
 export const columns: ColumnDef<DocumentType>[] = [
@@ -94,8 +95,13 @@ export const columns: ColumnDef<DocumentType>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const document = row.original;
+      const onEdit = (table.options.meta as Record<string, unknown>)?.onEdit as
+        | ((doc: DocumentType) => void)
+        | undefined;
+      const onDelete = (table.options.meta as Record<string, unknown>)
+        ?.onDelete as ((id: string) => void) | undefined;
 
       return (
         <DropdownMenu>
@@ -107,16 +113,43 @@ export const columns: ColumnDef<DocumentType>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(document.id)}
-            >
-              Copy document ID
+            <DropdownMenuItem onClick={() => onEdit?.(document)}>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem>Download</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">
-              Delete
+            <DropdownMenuItem
+              className="text-red-600"
+              onClick={() => {
+                if (confirm('Are you sure you want to delete this document?')) {
+                  onDelete?.(document.id);
+                }
+              }}
+              disabled={
+                (table.options.meta as Record<string, unknown>)
+                  ?.deletingIds instanceof Array &&
+                (
+                  (table.options.meta as Record<string, unknown>)
+                    ?.deletingIds as string[]
+                )?.includes(document.id)
+              }
+            >
+              {(table.options.meta as Record<string, unknown>)
+                ?.deletingIds instanceof Array &&
+              (
+                (table.options.meta as Record<string, unknown>)
+                  ?.deletingIds as string[]
+              )?.includes(document.id) ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </>
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

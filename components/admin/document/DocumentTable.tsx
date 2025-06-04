@@ -27,11 +27,17 @@ import { Input } from '@/components/ui/input';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onEdit?: (document: TData) => void;
+  onDelete?: (id: string) => void;
+  meta?: Record<string, unknown>;
 }
 
 export function DocumentTable<TData, TValue>({
   columns,
   data,
+  onEdit,
+  onDelete,
+  meta = {},
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -40,7 +46,6 @@ export function DocumentTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-
   const table = useReactTable({
     data,
     columns,
@@ -52,6 +57,11 @@ export function DocumentTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    meta: {
+      onEdit: onEdit,
+      ...meta,
+      onDelete: onDelete,
+    },
     state: {
       sorting,
       columnFilters,
@@ -122,12 +132,12 @@ export function DocumentTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="text-muted-foreground text-sm">
+      <div className="flex items-center justify-end space-x-2">
+        <div className="text-muted-foreground flex-1 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="flex space-x-2">
+        <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
