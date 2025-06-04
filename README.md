@@ -1,8 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js RAG Application
+
+A modern RAG (Retrieval Augmented Generation) application built with Next.js, using ChromaDB for vector storage and Google's Gemini AI for text generation.
 
 ## Getting Started
 
-First, run the development server:
+1. Copy `.env.local.example` to `.env.local` and fill in your API keys:
+
+```bash
+cp .env.local.example .env.local
+```
+
+2. Run ChromaDB using Docker:
+
+```bash
+docker-compose up -d
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
