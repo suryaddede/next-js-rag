@@ -83,10 +83,10 @@ export async function getDocuments(limit?: number) {
  * @param document - The text content to be stored and embedded
  * @param metadata - Additional information about the document including title and source URL
  * @param id - Unique identifier for the document
- * @returns Promise that resolves when the document has been added
+ * @returns Promise that resolves when the document has been upserted
  * @throws Error if the operation fails
  */
-export async function addDocument(
+export async function upsertDocument(
   document: string,
   metadata: DocumentMetadata,
   id: string
@@ -100,8 +100,8 @@ export async function addDocument(
       ids: [id],
     });
   } catch (error) {
-    console.error(`Error adding document with ID ${id}:`, error);
-    throw new Error(`Failed to add document with ID: ${id}`);
+    console.error(`Error upserting document with ID ${id}:`, error);
+    throw new Error(`Failed to upsert document with ID: ${id}`);
   }
 }
 
