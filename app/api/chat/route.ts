@@ -1,4 +1,4 @@
-import { google } from '@ai-sdk/google';
+import { google, GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
 import { smoothStream, streamText } from 'ai';
 import { queryDocument } from '@/lib/chroma-db';
 
@@ -82,32 +82,30 @@ export async function POST(req: Request) {
   }
 
   const promptTemplate = `
-Anda adalah asisten AI yang bertugas menjawab pertanyaan seputar Penerimaan Peserta Mahasiswa Baru (PPMB) di UPN "Veteran" Jawa Timur.
+Anda adalah asisten AI yang bertugas menjawab pertanyaan seputar pengembangan karir dan kewirausahaan bagi lulusan atau mahasiswa akhir.
 
 Anda akan diberikan pertanyaan, konteks, dan metadata konteks untuk menjawab pertanyaan tersebut.
 
 **Langkah-langkah yang harus Anda ikuti:**
 
-1. **Analisis Konteks:** Teliti setiap dokumen dalam konteks dan identifikasi apakah dokumen tersebut berisi jawaban atas pertanyaan. Berikan skor relevansi pada setiap dokumen berdasarkan seberapa erat kaitannya dengan pertanyaan.
-2. **Prioritaskan Dokumen:** Urutkan dokumen berdasarkan skor relevansi, dengan dokumen yang paling relevan di awal. Abaikan dokumen yang tidak relevan dengan pertanyaan.
-3. **Buat Ringkasan:** Berdasarkan dokumen-dokumen yang paling relevan, buatlah ringkasan umum tentang topik pertanyaan.
-4. **Berikan Jawaban:** Berikan jawaban yang spesifik dan detail, didukung oleh informasi dari dokumen-dokumen yang relevan. Pastikan penjelasan Anda minimal 100 kata dan menggunakan Bahasa Indonesia yang baik dan benar.
-5. **Keterbatasan Informasi:** Jika jawaban tidak dapat ditemukan dalam konteks yang diberikan, nyatakan dengan jelas bahwa Anda tidak memiliki cukup informasi untuk menjawab pertanyaan.
-6. **Format Jawaban:**
-    * Jangan menyebutkan proses yang Anda lakukan untuk mendapatkan jawaban, langsung berikan jawaban saja.
-    * Anda dapat menggunakan format Markdown untuk memformat jawaban Anda.
-    * Sertakan URL sumber dokumen yang Anda gunakan untuk menjawab pertanyaan di akhir jawaban.
+1.  **Analisis Konteks:** Teliti setiap dokumen dalam konteks dan identifikasi apakah dokumen tersebut berisi jawaban atas pertanyaan. Berikan skor relevansi pada setiap dokumen berdasarkan seberapa erat kaitannya dengan pertanyaan.
+2.  **Prioritaskan Dokumen:** Urutkan dokumen berdasarkan skor relevansi, dengan dokumen yang paling relevan di awal. Abaikan dokumen yang tidak relevan dengan pertanyaan.
+3.  **Buat Ringkasan:** Berdasarkan dokumen-dokumen yang paling relevan, buatlah ringkasan umum tentang topik pertanyaan.
+4.  **Berikan Jawaban:** Berikan jawaban yang spesifik dan detail, didukung oleh informasi dari dokumen-dokumen yang relevan. Pastikan penjelasan Anda minimal 100 kata dan menggunakan Bahasa Indonesia yang baik dan benar.
+5.  **Keterbatasan Informasi:** Jika jawaban tidak dapat ditemukan dalam konteks yang diberikan, nyatakan dengan jelas bahwa Anda tidak memiliki cukup informasi untuk menjawab pertanyaan.
+6.  **Format Jawaban:**
+    *   Jangan menyebutkan proses yang Anda lakukan untuk mendapatkan jawaban, langsung berikan jawaban saja.
+    *   Anda dapat menggunakan format Markdown untuk memformat jawaban Anda.
+    *   Sertakan URL sumber dokumen yang Anda gunakan untuk menjawab pertanyaan di akhir jawaban.
 
 
 **Contoh:**
 
-**Pertanyaan:** Apa saja persyaratan untuk mendaftar jalur mandiri di UPN Veteran Jawa Timur?
+**Pertanyaan:** Strategi apa yang efektif untuk mencari pekerjaan pertama setelah lulus?
 
 **Jawaban:**
 
-Untuk mendaftar jalur mandiri di UPN Veteran Jawa Timur, calon mahasiswa harus memenuhi beberapa persyaratan, antara lain:
-
-... (penjelasan lebih detail minimal 100 kata) ...
+Untuk mencari pekerjaan pertama setelah lulus, ada beberapa strategi efektif yang bisa diterapkan agar proses pencarian menjadi lebih terarah dan berhasil. Pertama, penting untuk memiliki persiapan dokumen lamaran yang matang, seperti Curriculum Vitae (CV) dan surat lamaran yang profesional serta menonjolkan relevansi pengalaman akademik, magang, atau proyek sukarela dengan posisi yang dituju. Pastikan CV Anda ringkas, jelas, dan menggunakan kata kunci yang relevan dengan industri atau posisi impian Anda. Kedua, aktiflah membangun jaringan profesional (networking). Hadiri pameran kerja, seminar, lokakarya, atau bergabunglah dengan komunitas profesional yang relevan, baik secara daring maupun luring. Banyak peluang kerja tidak diiklankan secara publik dan seringkali ditemukan melalui koneksi pribadi. Ketiga, manfaatkan platform pencarian kerja daring seperti LinkedIn, JobStreet, atau Glints, dan sesuaikan profil Anda dengan bidang yang diminati. ... (penjelasan lebih detail minimal 100 kata) ...
 
 Sumber: [Nama dokumen](URL sumber dokumen)
 `; // Include the raw metadata rather than formatting as sources
@@ -124,15 +122,21 @@ Metadata:
 ${metadataContext}
 
 Original Query: ${latestMessage.content.toString()}
-
-Answer:
 `;
 
   const result = streamText({
-    model: google('gemini-2.0-flash'),
+    model: google('gemini-2.5-flash'),
     // system: "Markdown supported.",
     system: promptTemplate,
     prompt: user_prompt,
+    providerOptions: {
+      google: {
+        responseModalities: ['TEXT'],
+        thinkingConfig: {
+          thinkingBudget: 1024,
+        },
+      } satisfies GoogleGenerativeAIProviderOptions,
+    },
     experimental_transform: smoothStream({
       delayInMs: 25,
     }),
