@@ -26,35 +26,46 @@ export type DocumentMetadata = {
  * ChromaDB client instance for interacting with the vector database
  */
 const client = new ChromaClient({
-  path: 'http://localhost:8000',
+  path: process.env.CHROMA_URL || 'http://localhost:8000',
 });
 
 /**
- * Embedding function that converts text to vector representations using Voyage AI
- * Requires the VOYAGE_AI_API_KEY environment variable to be properly set
+ * Lazy initialization of the collection to avoid build-time issues
+ * This will be called only when the collection is actually needed
  */
-const embedder = new VoyageAIEmbeddingFunction({
-  api_key_env_var: 'VOYAGE_AI_API_KEY',
-  model: 'voyage-3-large',
-});
+let _collection: Promise<any> | null = null; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-/**
- * Document collection in ChromaDB
- * Uses cosine similarity for nearest neighbor search in the HNSW index
- */
-const collection = client
-  .getOrCreateCollection({
-    name: 'knowledge_base',
-    embeddingFunction: embedder,
-    configuration: {
-      hnsw: {
-        space: 'cosine',
+function getCollection() {
+  if (!_collection) {
+    _collection = initializeCollection();
+  }
+  return _collection;
+}
+
+async function initializeCollection() {
+  try {
+    // Initialize embedding function only when needed
+    const embedder = new VoyageAIEmbeddingFunction({
+      api_key_env_var: 'VOYAGE_AI_API_KEY',
+      model: 'voyage-3-large',
+    });
+
+    const collection = await client.getOrCreateCollection({
+      name: 'knowledge_base',
+      embeddingFunction: embedder,
+      configuration: {
+        hnsw: {
+          space: 'cosine',
+        },
       },
-    },
-  })
-  .catch((error) => {
-    throw new Error('Failed to initialize ChromaDB collection', error);
-  });
+    });
+
+    return collection;
+  } catch (error) {
+    console.error('Failed to initialize ChromaDB collection:', error);
+    throw new Error('Failed to initialize ChromaDB collection: ' + error);
+  }
+}
 
 /**
  * Retrieves documents from the collection
@@ -65,9 +76,8 @@ const collection = client
  */
 export async function getDocuments(limit?: number) {
   try {
-    const result = await (
-      await collection
-    ).get({
+    const collection = await getCollection();
+    const result = await collection.get({
       limit: limit,
     });
     return result;
@@ -92,9 +102,8 @@ export async function upsertDocument(
   id: string
 ) {
   try {
-    await (
-      await collection
-    ).upsert({
+    const collection = await getCollection();
+    await collection.upsert({
       documents: [document],
       metadatas: [metadata],
       ids: [id],
@@ -114,7 +123,8 @@ export async function upsertDocument(
  */
 export async function deleteDocument(id: string) {
   try {
-    await (await collection).delete({ ids: [id] });
+    const collection = await getCollection();
+    await collection.delete({ ids: [id] });
   } catch (error) {
     console.error(`Error deleting document with ID ${id}:`, error);
     throw new Error(`Failed to delete document with ID: ${id}`);
@@ -132,9 +142,8 @@ export async function deleteDocument(id: string) {
  */
 export async function queryDocument(query: string, limit: number = 12) {
   try {
-    const results = await (
-      await collection
-    ).query({
+    const collection = await getCollection();
+    const results = await collection.query({
       queryTexts: query,
       nResults: limit,
     });

@@ -3,6 +3,7 @@ version: '3.9'
 services:
   chromadb:
     image: chromadb/chroma:latest
+    container_name: chromadb
     volumes:
       # Persist the database data on disk
       - ./chroma_data:/chroma/chroma
@@ -18,3 +19,34 @@ services:
       # Map container port 8000 to host port 8000
       - "8000:8000"
     restart: unless-stopped
+    networks:
+      - rag-network
+
+  nextjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VOYAGE_AI_API_KEY=${VOYAGE_AI_API_KEY}
+        - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
+    container_name: nextjs-rag-app
+    ports:
+      - "3000:3000"
+    environment:
+      # ChromaDB connection will be through the internal network
+      - CHROMA_URL=http://chromadb:8000
+      # Pass API keys from .env.local
+      - VOYAGE_AI_API_KEY=${VOYAGE_AI_API_KEY}
+      - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    env_file:
+      - .env.local
+    depends_on:
+      - chromadb
+    restart: unless-stopped
+    networks:
+      - rag-network
+
+networks:
+  rag-network:
+    driver: bridge
