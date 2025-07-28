@@ -24,6 +24,12 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-4">
+          <a
+            href="/demo"
+            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+          >
+            Integration Demo
+          </a>
           <ThemeToggle />
         </div>
       </header>

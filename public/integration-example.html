@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Page with RAG Chat Widget</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+        }
+        .content {
+            line-height: 1.6;
+            color: #666;
+        }
+        .highlight {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2563eb;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Example PHP Page</h1>
+        <div class="content">
+            <p>This is an example of how to integrate the RAG Chat Widget into your PHP webpage.</p>
+            
+            <div class="highlight">
+                <h3>Integration Methods:</h3>
+                <ol>
+                    <li><strong>JavaScript Widget (Recommended):</strong> Add the script tag below to your PHP page</li>
+                    <li><strong>iframe Method:</strong> Use direct iframe embedding for simpler integration</li>
+                </ol>
+            </div>
+
+            <h2>Method 1: JavaScript Widget Integration</h2>
+            <p>Add this script tag to your PHP page:</p>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;"><code>&lt;script src="http://localhost:3000/chat-widget.js"&gt;&lt;/script&gt;</code></pre>
+
+            <p>For custom configuration:</p>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;"><code>&lt;script&gt;
+window.RAGChatWidget.init({
+    baseUrl: 'http://your-domain.com',
+    position: 'bottom-right',
+    buttonColor: '#059669',
+    title: 'Support Chat',
+    maxWidth: '400px',
+    maxHeight: '600px'
+});
+&lt;/script&gt;</code></pre>
+
+            <h2>Method 2: Direct iframe Integration</h2>
+            <p>For simpler integration, you can use a direct iframe:</p>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;"><code>&lt;iframe 
+    src="http://localhost:3000/embed" 
+    style="position: fixed; bottom: 0; right: 0; width: 100vw; height: 100vh; border: none; pointer-events: none; z-index: 1000;"
+    onload="this.style.pointerEvents='auto'"&gt;
+&lt;/iframe&gt;</code></pre>
+
+            <h2>PHP Integration Example</h2>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;"><code>&lt;?php
+// Your PHP code here
+echo "&lt;h1&gt;Welcome to our website&lt;/h1&gt;";
+?&gt;
+
+&lt;!-- Add the chat widget --&gt;
+&lt;script src="http://localhost:3000/chat-widget.js"&gt;&lt;/script&gt;</code></pre>
+
+            <p>The chat widget will appear as a floating button in the bottom-right corner of your page. Users can click it to open the chat interface.</p>
+        </div>
+    </div>
+
+    <!-- RAG Chat Widget Integration -->
+    <script src="http://localhost:3000/chat-widget.js"></script>
+</body>
+</html>
