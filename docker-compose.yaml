@@ -26,19 +26,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        - VOYAGE_AI_API_KEY=${VOYAGE_AI_API_KEY}
-        - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
     container_name: nextjs-rag-app
     ports:
       - "3000:3000"
     environment:
       # ChromaDB connection will be through the internal network
       - CHROMA_URL=http://chromadb:8000
-      # Pass API keys from .env.local
-      - VOYAGE_AI_API_KEY=${VOYAGE_AI_API_KEY}
-      - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
-      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
     env_file:
       - .env.local
     depends_on:
