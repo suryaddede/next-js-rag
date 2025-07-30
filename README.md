@@ -1,12 +1,13 @@
 # Next.js RAG Application
 
-A modern RAG (Retrieval Augmented Generation) application built with Next.js, using ChromaDB for vector storage and Google's Gemini AI for text generation.
+A modern RAG (Retrieval Augmented Generation) application built with Next.js, using ChromaDB for vector storage, Voyage AI for embeddings, and Google's Gemini AI for text generation.
 
 ## 🌟 Features
 
 - 🚀 **Modern Next.js 15** with App Router
 - 🧠 **RAG implementation** with ChromaDB vector database
 - 🤖 **Google Gemini AI** integration for intelligent responses
+- 🔍 **Voyage AI embeddings** for semantic search and retrieval
 - 🎨 **Beautiful UI** with shadcn/ui and Tailwind CSS
 - 📱 **Responsive design** with mobile support
 - 🔐 **Admin panel** for document management
@@ -21,7 +22,7 @@ A modern RAG (Retrieval Augmented Generation) application built with Next.js, us
 
 - Docker and Docker Compose
 - Google AI API key ([Get one here](https://aistudio.google.com/app/apikey))
-- Voyage AI API key ([Get one here](https://dash.voyageai.com/)) - Optional but recommended
+- Voyage AI API key ([Get one here](https://dash.voyageai.com/))
 
 ### Option 1: Docker Deployment (Recommended)
 
@@ -221,7 +222,7 @@ The app supports multiple environment configurations:
 | Variable                       | Description                           | Required       |
 | ------------------------------ | ------------------------------------- | -------------- |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Google AI API key for text generation | ✅ Yes         |
-| `VOYAGE_AI_API_KEY`            | Voyage AI API key for embeddings      | ⚠️ Recommended |
+| `VOYAGE_AI_API_KEY`            | Voyage AI API key for embeddings      | ✅ Yes         |
 | `CHROMA_URL`                   | ChromaDB connection URL               | ✅ Yes         |
 | `NEXT_PUBLIC_APP_URL`          | Public app URL for widgets            | ✅ Yes         |
 
