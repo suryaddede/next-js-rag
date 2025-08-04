@@ -226,6 +226,23 @@ The app supports multiple environment configurations:
 | `CHROMA_URL`                   | ChromaDB connection URL               | ✅ Yes         |
 | `NEXT_PUBLIC_APP_URL`          | Public app URL for widgets            | ✅ Yes         |
 
+### Optional Configuration Variables
+
+| Variable          | Description                               | Default            |
+| ----------------- | ----------------------------------------- | ------------------ |
+| `CHUNK_SIZE`      | Maximum tokens per document chunk        | `1000`             |
+| `EMBEDDING_MODEL` | Voyage AI embedding model to use         | `voyage-3-large`   |
+
+### Intelligent Document Chunking
+
+The application now features intelligent document chunking that automatically:
+
+- **Token-based chunking**: Uses tiktoken to count tokens and optimize chunk sizes
+- **Markdown-aware splitting**: Respects markdown headers and structure when splitting content
+- **Adaptive strategy**: Uses simple chunking for small documents, header-based splitting for larger ones
+- **Configurable limits**: Customize chunk size via `CHUNK_SIZE` environment variable
+- **Overlap handling**: Implements smart overlap between chunks to preserve context
+
 For detailed environment setup, see [`ENV_SETUP.md`](ENV_SETUP.md).
 
 ## 🏗️ Architecture

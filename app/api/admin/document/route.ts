@@ -81,19 +81,21 @@ export async function POST(request: NextRequest) {
     };
 
     // Upsert document to ChromaDB
-    await upsertDocument(markdownResult.markdown, metadata, docId);
+    const result = await upsertDocument(markdownResult.markdown, metadata, docId);
 
     return NextResponse.json(
       {
         success: true,
         message: 'Document created successfully',
         data: {
-          id: docId,
+          id: result.documentId,
           title: title.trim(),
           type: markdownResult.contentType,
           size: `${markdownResult.markdown.length} chars`,
+          chunks: result.chunksStored,
           updated: metadata.last_update,
           url: markdownResult.sourceUrl,
+          chunkDetails: result.chunks,
         },
       },
       { status: 201 }
@@ -164,18 +166,20 @@ export async function PUT(request: NextRequest) {
     };
 
     // Upsert document to ChromaDB with the same ID
-    await upsertDocument(markdownResult.markdown, metadata, id);
+    const result = await upsertDocument(markdownResult.markdown, metadata, id);
 
     return NextResponse.json({
       success: true,
       message: 'Document updated successfully',
       data: {
-        id: id,
+        id: result.documentId,
         title: title.trim(),
         type: markdownResult.contentType,
         size: `${markdownResult.markdown.length} chars`,
+        chunks: result.chunksStored,
         updated: metadata.last_update,
         url: markdownResult.sourceUrl,
+        chunkDetails: result.chunks,
       },
     });
   } catch (error) {
