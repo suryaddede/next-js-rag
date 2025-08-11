@@ -239,7 +239,7 @@ export async function deleteDocument(id: string) {
  */
 export async function queryDocument(
   query: string | string[],
-  limit: number = 7
+  limit: number = 100
 ) {
   try {
     const collection = await getCollectionInstance();

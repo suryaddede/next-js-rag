@@ -9,10 +9,6 @@ import { getEncoding } from 'js-tiktoken';
  * 4. Uses js-tiktoken for token counting (no WASM issues).
  */
 
-// Default chunk + overlap (token units)
-const DEFAULT_CHUNK_SIZE = 1000; // tokens
-const DEFAULT_CHUNK_OVERLAP = 150; // tokens
-
 /**
  * Represents a chunk of content with metadata
  */
@@ -133,8 +129,8 @@ export async function chunkContent(
   metadata: { title: string; source: string },
   limit?: number
 ): Promise<ContentChunk[]> {
-  const chunkLimitTokens = limit || (process.env.CHUNK_SIZE ? parseInt(process.env.CHUNK_SIZE, 10) : DEFAULT_CHUNK_SIZE);
-  const overlapTokens = process.env.CHUNK_OVERLAP ? parseInt(process.env.CHUNK_OVERLAP, 10) : DEFAULT_CHUNK_OVERLAP;
+  const chunkLimitTokens = limit || (process.env.CHUNK_SIZE ? parseInt(process.env.CHUNK_SIZE, 10) : 2000);
+  const overlapTokens = process.env.CHUNK_OVERLAP ? parseInt(process.env.CHUNK_OVERLAP, 10) : 200;
 
   const totalTokens = countTokens(markdownizedContent);
   console.log(`[chunking] Total tokens for "${metadata.title}": ${totalTokens}`);

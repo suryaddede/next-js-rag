@@ -4,7 +4,7 @@ services:
     container_name: chromadb
     volumes:
       # Persist the database data on disk
-      - ./chroma_data:/chroma/chroma
+      - ./chroma_data:/data
     environment:
       # Environment variables for configuring Chroma
       - ALLOW_RESET=true

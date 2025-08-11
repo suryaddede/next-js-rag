@@ -3,7 +3,7 @@ services:
     image: chromadb/chroma:latest
     container_name: chromadb-prod
     volumes:
-      - chromadb_data:/chroma/chroma
+      - chromadb_data:/data
     environment:
       - ALLOW_RESET=false
       - ANONYMIZED_TELEMETRY=false
