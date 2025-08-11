@@ -4,6 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FileText, MoreHorizontal, Trash2, Edit, Loader2, ExternalLink } from 'lucide-react';
+import { getCurrentTimestamp } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -85,7 +86,11 @@ export const columns: ColumnDef<DocumentType>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue('updated')}</div>,
+    cell: ({ row }) => {
+      const updated = row.getValue('updated') as string;
+      const formattedDate = getCurrentTimestamp(new Date(updated));
+      return <div>{formattedDate}</div>;
+    },
   },
   {
     id: 'actions',
