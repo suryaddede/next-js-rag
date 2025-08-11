@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, MoreHorizontal, Trash2, Edit, Loader2 } from 'lucide-react';
+import { FileText, MoreHorizontal, Trash2, Edit, Loader2, ExternalLink } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,6 @@ export type DocumentType = {
   id: string;
   title: string;
   type: string;
-  size: string;
   updated: string;
   url?: string; // Added for document source URL
 };
@@ -74,11 +73,6 @@ export const columns: ColumnDef<DocumentType>[] = [
     cell: ({ row }) => <div>{row.getValue('type')}</div>,
   },
   {
-    accessorKey: 'size',
-    header: 'Size',
-    cell: ({ row }) => <div>{row.getValue('size')}</div>,
-  },
-  {
     accessorKey: 'updated',
     header: ({ column }) => {
       return (
@@ -113,6 +107,14 @@ export const columns: ColumnDef<DocumentType>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            {document.url && (
+              <DropdownMenuItem 
+                onClick={() => window.open(document.url, '_blank')}
+              >
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Visit URL
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => onEdit?.(document)}>
               <Edit className="mr-2 h-4 w-4" />
               Edit

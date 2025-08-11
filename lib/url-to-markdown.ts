@@ -1,4 +1,4 @@
-import { google, GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
+import { google } from '@ai-sdk/google';
 import { generateText } from 'ai';
 import * as cheerio from 'cheerio';
 import { getCurrentTimestamp } from './utils';
@@ -19,12 +19,6 @@ const CONTENT_TYPES: Record<string, ContentType> = {
   'application/json': 'json',
   'application/vnd.api+json': 'json',
   'text/html': 'html',
-};
-
-const MODEL = {
-  pdf: 'gemini-2.0-flash',
-  json: 'gemini-2.5-flash-preview-05-20',
-  html: 'gemini-2.5-flash-preview-05-20',
 };
 
 // Prompt templates
@@ -174,21 +168,10 @@ export async function convertToMarkdown(url: string): Promise<MarkdownResult> {
 
   // Generate markdown with AI
   const { text } = await generateText({
-    model: google(MODEL[contentType]),
+    model: google('gemini-2.5-flash-lite'),
     system: PROMPTS[contentType],
     messages: [{ role: 'user', content: userContent }],
     temperature: 0.1,
-    providerOptions: {
-      google: {
-        responseModalities: ['TEXT'],
-        // Only apply thinking config for non-PDF content types
-        ...(contentType !== 'pdf' && {
-          thinkingConfig: {
-            thinkingBudget: 0,
-          },
-        }),
-      } satisfies GoogleGenerativeAIProviderOptions,
-    },
   });
 
   const lastUpdate = getCurrentTimestamp();

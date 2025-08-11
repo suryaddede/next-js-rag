@@ -48,21 +48,43 @@ export default function DocumentPage() {
 
       if (!result.success) {
         throw new Error(result.message || 'Failed to fetch documents');
-      } // Map API response to our table format
-      const formattedDocs =
-        result.data?.ids.map((id: string, index: number) => {
-          const metadata = result.data?.metadatas[index];
-          const updatedTimestamp =
-            metadata?.last_update || getCurrentTimestamp();
-          return {
-            id: id,
-            title: metadata?.title || 'Untitled Document',
-            type: metadata?.content_type || 'unknown',
-            size: `${result.data?.documents[index]?.length || 0} chars`,
+      }
+
+      // Group chunks by document title to show only parent documents
+      const documentMap = new Map<string, DocumentType>();
+      
+      result.data?.ids.forEach((id: string, index: number) => {
+        const metadata = result.data?.metadatas[index];
+        const title = metadata?.title || 'Untitled Document';
+        const updatedTimestamp = metadata?.last_update || getCurrentTimestamp();
+        
+        // Only add if this document title hasn't been added yet
+        if (!documentMap.has(title)) {
+          // Map content types to more user-friendly names
+          const getDisplayType = (contentType: string) => {
+            switch (contentType) {
+              case 'html':
+                return 'webpage';
+              case 'pdf':
+                return 'PDF';
+              case 'json':
+                return 'JSON';
+              default:
+                return 'webpage'; // Default to webpage instead of unknown
+            }
+          };
+
+          documentMap.set(title, {
+            id: title, // Use title as ID for parent document
+            title: title,
+            type: getDisplayType(metadata?.content_type || 'html'),
             updated: updatedTimestamp,
             url: metadata?.source_url || '',
-          } as DocumentType;
-        }) || [];
+          } as DocumentType);
+        }
+      });
+      
+      const formattedDocs = Array.from(documentMap.values());
 
       setDocuments(formattedDocs);
     } catch (error) {
