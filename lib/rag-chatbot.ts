@@ -65,6 +65,7 @@ You will be provided with a question, context, and context metadata to answer th
 'To find your first job after graduation, there are several effective strategies you can apply, including:'
 ... (more detailed explanation of at least 100 words) ...
 
+
 Related sources:
 [Document Name](Source document URL)
 [Document Name](Source document URL)
@@ -75,21 +76,27 @@ Related sources:
   /**
    * Rewrite the user query using Google Generative AI for better search
    */
-  private async rewriteQuery(query: string, maxRetries: number = 3): Promise<string[]> {
+  private async rewriteQuery(
+    query: string,
+    maxRetries: number = 3
+  ): Promise<string[]> {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const { text } = await generateText({
           model: google('gemini-2.5-flash'),
           messages: [
             { role: 'system', content: RAGChatbot.REWRITER_PROMPT },
-            { role: 'user', content: query }
+            { role: 'user', content: query },
           ],
         });
 
         const rewrittenQueries = [query];
-        const lines = text.trim().split('\n').filter(line => line.trim());
+        const lines = text
+          .trim()
+          .split('\n')
+          .filter((line) => line.trim());
         rewrittenQueries.push(...lines);
-        
+
         return rewrittenQueries;
       } catch (error) {
         console.error(`Error rewriting query (attempt ${attempt + 1}):`, error);
@@ -98,7 +105,9 @@ Related sources:
           return [query];
         }
         // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * (attempt + 1))
+        );
       }
     }
     return [query];
@@ -107,14 +116,19 @@ Related sources:
   /**
    * Perform similarity search with unique document deduplication
    */
-  private async similaritySearch(rewrittenQueries: string[]): Promise<RetrievedInformation> {
+  private async similaritySearch(
+    rewrittenQueries: string[]
+  ): Promise<RetrievedInformation> {
     try {
       const results = await queryDocument(rewrittenQueries);
-      
-      const uniqueInformation: Record<string, {
-        document: string;
-        metadata: Record<string, string | number | boolean | undefined>;
-      }> = {};
+
+      const uniqueInformation: Record<
+        string,
+        {
+          document: string;
+          metadata: Record<string, string | number | boolean | undefined>;
+        }
+      > = {};
 
       // Process results to remove duplicates
       if (results.ids && results.documents && results.metadatas) {
@@ -122,14 +136,14 @@ Related sources:
           const idGroup = results.ids[i];
           const docGroup = results.documents[i];
           const metaGroup = results.metadatas[i];
-          
+
           if (idGroup && docGroup && metaGroup) {
             for (let j = 0; j < idGroup.length; j++) {
               const docId = idGroup[j];
               if (docId && !uniqueInformation[docId]) {
                 uniqueInformation[docId] = {
                   document: docGroup[j] || '',
-                  metadata: metaGroup[j] || {}
+                  metadata: metaGroup[j] || {},
                 };
               }
             }
@@ -138,13 +152,17 @@ Related sources:
       }
 
       const uniqueIds = Object.keys(uniqueInformation);
-      const uniqueDocuments = uniqueIds.map(id => uniqueInformation[id].document);
-      const uniqueMetadatas = uniqueIds.map(id => uniqueInformation[id].metadata);
+      const uniqueDocuments = uniqueIds.map(
+        (id) => uniqueInformation[id].document
+      );
+      const uniqueMetadatas = uniqueIds.map(
+        (id) => uniqueInformation[id].metadata
+      );
 
       return {
         ids: uniqueIds,
         documents: uniqueDocuments,
-        metadatas: uniqueMetadatas
+        metadatas: uniqueMetadatas,
       };
     } catch (error) {
       console.error('Error in similarity search:', error);
@@ -155,7 +173,10 @@ Related sources:
   /**
    * Create the user prompt for the generation model
    */
-  private createUserPrompt(query: string, retrievedInformation: RetrievedInformation): string {
+  private createUserPrompt(
+    query: string,
+    retrievedInformation: RetrievedInformation
+  ): string {
     return `
 Context:
 ${retrievedInformation.documents.join('\n\n')}
@@ -191,7 +212,7 @@ Original Query: ${query}
         rewrittenQueries,
         retrievedInfo,
         userPrompt,
-        systemPrompt
+        systemPrompt,
       };
     } catch (error) {
       console.error('Error in processQuery:', error);

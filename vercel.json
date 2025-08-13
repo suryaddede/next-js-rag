@@ -1,11 +1,7 @@
 {
-  "env": {
-    "CHROMA_URL": "http://suryadhi.space:8000",
-    "EMBEDDING_MODEL": "voyage-3-large"
-  },
   "functions": {
     "app/api/*/route.ts": {
-      "maxDuration": 60
+      "maxDuration": 300
     }
   },
   "headers": [
