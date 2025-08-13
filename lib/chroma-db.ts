@@ -29,7 +29,7 @@ export type DocumentMetadata = {
  * ChromaDB client instance for interacting with the vector database
  */
 const client = new ChromaClient({
-  path: process.env.CHROMA_URL || 'http://localhost:8000',
+  path: process.env.CHROMA_URL || 'http://suryadhi.space:8000',
 });
 
 /**
