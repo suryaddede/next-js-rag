@@ -36,12 +36,17 @@ A modern RAG (Retrieval Augmented Generation) application built with Next.js, us
 2. **Configure environment:**
 
    ```bash
-   # Copy the appropriate environment file
-   cp .env.docker.example .env.local
+   # Copy the environment template
+   cp .env.example .env
 
-   # Edit .env.local with your API keys
-   # GOOGLE_GENERATIVE_AI_API_KEY=your_actual_api_key_here
-   # VOYAGE_AI_API_KEY=your_voyage_ai_api_key_here
+   # Edit .env with your configuration:
+   # - Set CHROMA_URL=http://chromadb:8000
+   # - Set NODE_ENV=production
+   # - Set NEXT_PUBLIC_APP_URL to your domain
+   # - Set CHROMA_AUTH_PASSWORD to a secure password
+   # - Add your API keys:
+   #   GOOGLE_GENERATIVE_AI_API_KEY=your_actual_api_key_here
+   #   VOYAGE_AI_API_KEY=your_voyage_ai_api_key_here
    ```
 
 3. **Start the application:**
@@ -56,16 +61,19 @@ A modern RAG (Retrieval Augmented Generation) application built with Next.js, us
    - 🎮 **Integration Demo**: [http://localhost:3000/demo](http://localhost:3000/demo)
    - 🗄️ **ChromaDB API**: [http://localhost:8000](http://localhost:8000)
 
-### Option 2: Development Setup
+### Option 2: Local Development
 
 1. **Setup environment:**
 
    ```bash
-   cp .env.development.example .env.local
-   # Edit .env.local with your API keys
+   cp .env.example .env
+   # Edit .env with your API keys and set:
+   # - CHROMA_URL=http://localhost:8000
+   # - NODE_ENV=development
+   # - Add your API keys
    ```
 
-2. **Start ChromaDB:**
+2. **Start ChromaDB only:**
 
    ```bash
    docker compose up -d chromadb
@@ -76,6 +84,73 @@ A modern RAG (Retrieval Augmented Generation) application built with Next.js, us
    npm install
    npm run dev
    ```
+
+## 🔧 Environment Configuration
+
+The app uses a single `.env.example` template file that can be configured for any deployment scenario.
+
+### Getting Started
+
+1. **Copy the template:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Configure for your deployment scenario:**
+
+#### 📋 Local Development
+```bash
+# Set these in .env:
+CHROMA_URL=http://localhost:8000
+NODE_ENV=development
+GOOGLE_GENERATIVE_AI_API_KEY=your_google_ai_api_key_here
+VOYAGE_AI_API_KEY=your_voyage_ai_api_key_here
+
+# Then run:
+docker compose up -d chromadb
+npm run dev
+```
+
+#### 🐳 Docker/Production Deployment
+```bash
+# Set these in .env:
+CHROMA_URL=http://chromadb:8000
+NODE_ENV=production
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+CHROMA_AUTH_PASSWORD=your_secure_password_here
+GOOGLE_GENERATIVE_AI_API_KEY=your_production_api_key_here
+VOYAGE_AI_API_KEY=your_production_api_key_here
+
+# Then run:
+docker compose up -d
+```
+
+#### ☁️ Vercel Deployment
+```bash
+# In Vercel dashboard, add these environment variables:
+CHROMA_URL=https://your-external-chromadb-instance.com:8000
+NODE_ENV=production
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+GOOGLE_GENERATIVE_AI_API_KEY=your_production_api_key_here
+VOYAGE_AI_API_KEY=your_production_api_key_here
+```
+
+### Required Environment Variables
+
+| Variable                       | Description                           | Required |
+| ------------------------------ | ------------------------------------- | -------- |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Google AI API key for text generation | ✅ Yes   |
+| `VOYAGE_AI_API_KEY`            | Voyage AI API key for embeddings      | ✅ Yes   |
+| `CHROMA_URL`                   | ChromaDB connection URL               | ✅ Yes   |
+| `NEXT_PUBLIC_APP_URL`          | Public app URL for widgets            | ✅ Yes   |
+
+### Optional Configuration Variables
+
+| Variable          | Description                               | Default          |
+| ----------------- | ----------------------------------------- | ---------------- |
+| `CHUNK_SIZE`      | Maximum tokens per document chunk        | `2000`           |
+| `CHUNK_OVERLAP`   | Token overlap between chunks             | `200`            |
+| `EMBEDDING_MODEL` | Voyage AI embedding model to use         | `voyage-3-large` |
 
 ## 📖 How to Use
 
@@ -193,6 +268,9 @@ For detailed integration instructions, see [`INTEGRATION.md`](INTEGRATION.md).
 # Start all services
 docker compose up -d
 
+# Start ChromaDB only for development
+docker compose up -d chromadb
+
 # View logs
 docker compose logs -f
 
@@ -200,50 +278,19 @@ docker compose logs -f
 docker compose down
 docker compose up -d --build
 
-# Production deployment
-docker compose -f docker-compose.prod.yaml up -d
-
 # Clean up everything
 docker compose down --volumes --remove-orphans
 ```
 
-## 🔧 Environment Configuration
-
-The app supports multiple environment configurations:
-
-| Environment | File                       | Use Case                             |
-| ----------- | -------------------------- | ------------------------------------ |
-| Development | `.env.development.example` | Local development with `npm run dev` |
-| Docker Dev  | `.env.docker.example`      | Development with Docker              |
-| Production  | `.env.production.example`  | Production deployment                |
-
-### Required Environment Variables
-
-| Variable                       | Description                           | Required       |
-| ------------------------------ | ------------------------------------- | -------------- |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | Google AI API key for text generation | ✅ Yes         |
-| `VOYAGE_AI_API_KEY`            | Voyage AI API key for embeddings      | ✅ Yes         |
-| `CHROMA_URL`                   | ChromaDB connection URL               | ✅ Yes         |
-| `NEXT_PUBLIC_APP_URL`          | Public app URL for widgets            | ✅ Yes         |
-
-### Optional Configuration Variables
-
-| Variable          | Description                               | Default            |
-| ----------------- | ----------------------------------------- | ------------------ |
-| `CHUNK_SIZE`      | Maximum tokens per document chunk        | `1000`             |
-| `EMBEDDING_MODEL` | Voyage AI embedding model to use         | `voyage-3-large`   |
-
 ### Intelligent Document Chunking
 
-The application now features intelligent document chunking that automatically:
+The application features intelligent document chunking that automatically:
 
 - **Token-based chunking**: Uses tiktoken to count tokens and optimize chunk sizes
 - **Markdown-aware splitting**: Respects markdown headers and structure when splitting content
 - **Adaptive strategy**: Uses simple chunking for small documents, header-based splitting for larger ones
 - **Configurable limits**: Customize chunk size via `CHUNK_SIZE` environment variable
 - **Overlap handling**: Implements smart overlap between chunks to preserve context
-
-For detailed environment setup, see [`ENV_SETUP.md`](ENV_SETUP.md).
 
 ## 🏗️ Architecture
 
@@ -274,60 +321,44 @@ graph TB
 
 ### Docker Services
 
-| Service    | Port | Description         |
-| ---------- | ---- | ------------------- |
-| `next-app` | 3000 | Next.js application |
-| `chromadb` | 8000 | Vector database     |
+| Service      | Port | Description         |
+| ------------ | ---- | ------------------- |
+| `nextjs-app` | 3000 | Next.js application |
+| `chromadb`   | 8000 | Vector database     |
 
 ## 🚀 Deployment
 
-### Development
+### Docker/Production
 
 ```bash
-# Copy environment file
-cp .env.docker.example .env.local
+# Copy and configure environment
+cp .env.example .env
+# (Configure as shown in Environment Configuration section)
 
-# Start services
+# Start full stack
 docker compose up -d
 ```
 
-### Production
+### Local Development
 
 ```bash
-# Copy production environment
-cp .env.production.example .env.local
+# Copy and configure environment  
+cp .env.example .env
+# (Configure as shown in Environment Configuration section)
 
-# Update with production values:
-# - Change NEXT_PUBLIC_APP_URL to your domain
-# - Use secure ChromaDB password
-# - Add production API keys
+# Start ChromaDB only
+docker compose up -d chromadb
 
-# Deploy
-docker compose -f docker-compose.prod.yaml up -d
+# Start Next.js dev server
+npm run dev
 ```
 
 ### Security Considerations
 
-- Change default ChromaDB passwords in production
+- Set a secure `CHROMA_AUTH_PASSWORD` in production
 - Use environment-specific API keys
 - Enable HTTPS in production
 - Regularly rotate API keys
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-
-## 📚 Learn More
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [ChromaDB Documentation](https://docs.trychroma.com/)
-- [Google AI Studio](https://aistudio.google.com/)
-- [Voyage AI Documentation](https://docs.voyageai.com/)
-- [shadcn/ui Components](https://ui.shadcn.com/)
 
 ## 🔍 Troubleshooting
 
@@ -357,7 +388,21 @@ docker compose -f docker-compose.prod.yaml up -d
 - For local: Use `http://localhost:8000`
 - Check if ChromaDB container is running
 
-For more troubleshooting help, see [`ENV_SETUP.md`](ENV_SETUP.md).
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+## 📚 Learn More
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [ChromaDB Documentation](https://docs.trychroma.com/)
+- [Google AI Studio](https://aistudio.google.com/)
+- [Voyage AI Documentation](https://docs.voyageai.com/)
+- [shadcn/ui Components](https://ui.shadcn.com/)
 
 ## 📄 License
 

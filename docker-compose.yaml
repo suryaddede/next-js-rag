@@ -6,19 +6,24 @@ services:
       # Persist the database data on disk
       - ./chroma_data:/data
     environment:
-      # Environment variables for configuring Chroma
-      - ALLOW_RESET=true
+      # Production-ready configuration
+      - ALLOW_RESET=false
       - ANONYMIZED_TELEMETRY=false
       - CHROMA_SERVER_AUTH_CREDENTIALS_PROVIDER=chromadb.auth.token.TokenAuthServerProvider
-      - CHROMA_SERVER_AUTH_CREDENTIALS=admin:admin
+      - CHROMA_SERVER_AUTH_CREDENTIALS=admin:${CHROMA_AUTH_PASSWORD:-secure_default_password}
       - CHROMA_SERVER_AUTH_PROVIDER=token
-      # You can add other environment variables as needed
     ports:
       # Map container port 8000 to host port 8000
       - "8000:8000"
     restart: unless-stopped
     networks:
       - rag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   nextjs-app:
     build:
@@ -30,13 +35,22 @@ services:
     environment:
       # ChromaDB connection will be through the internal network
       - CHROMA_URL=http://chromadb:8000
+      - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_TELEMETRY_DISABLED=1
     env_file:
-      - .env.local
+      - .env
     depends_on:
-      - chromadb
+      chromadb:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - rag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 networks:
   rag-network:
