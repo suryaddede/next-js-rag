@@ -1,12 +1,12 @@
 # RAG Chat Widget Integration Guide
 
-This guide explains how to integrate the RAG Chat Widget into your PHP webpages.
+This guide explains how to integrate the RAG Chat Widget into your HTML webpages.
 
 ## Quick Start
 
 ### Method 1: JavaScript Widget (Recommended)
 
-Add this single line to your PHP page:
+Add this single line to your HTML page:
 
 ```html
 <script src="http://your-domain.com/chat-widget.js"></script>
@@ -50,23 +50,20 @@ window.RAGChatWidget.init({
 - `top-right`
 - `top-left`
 
-## PHP Integration Examples
+## HTML Integration Examples
 
 ### Basic Integration
 
-```php
-<?php
-$page_title = "My Page";
-?>
+```html
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?php echo $page_title; ?></title>
+    <title>My Page</title>
 </head>
 <body>
     <h1>Welcome to my site</h1>
 
-    <!-- Your PHP content here -->
+    <!-- Your content here -->
 
     <!-- Chat Widget -->
     <script src="http://your-domain.com/chat-widget.js"></script>
@@ -76,7 +73,7 @@ $page_title = "My Page";
 
 ### Advanced Integration with Custom Config
 
-```php
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -107,7 +104,7 @@ $page_title = "My Page";
 
 1. **Deploy your Next.js app** to your server
 2. **Update the domain** in `chat-widget.js` from `localhost:3000` to your actual domain
-3. **Add the script tag** to your PHP pages
+3. **Add the script tag** to your HTML pages
 4. **Test the integration** by clicking the chat button
 
 ## Customization
@@ -146,7 +143,7 @@ maxHeight: '700px';
 - 🎨 **Customizable**: Configurable colors, position, and size
 - ⚡ **Fast**: Lightweight and optimized
 - 🔒 **Secure**: No external dependencies
-- 🌐 **Universal**: Works with any PHP/HTML page
+- 🌐 **Universal**: Works with any HTML page
 
 ## API Endpoints
 
@@ -185,8 +182,7 @@ window.RAGChatWidget.init({
 
 Check the included example files:
 
-- `integration-example.html` - Basic HTML example
-- `example.php` - PHP integration example
+- `integration-example.html` - Complete HTML integration example
 
 ## Support
 

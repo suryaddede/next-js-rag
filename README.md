@@ -13,7 +13,7 @@ A modern RAG (Retrieval Augmented Generation) application built with Next.js, us
 - 🔐 **Admin panel** for document management
 - 🐳 **Docker support** for easy deployment
 - 🌙 **Dark/Light theme** support
-- 🔗 **Embeddable widget** for PHP/HTML integration
+- 🔗 **Embeddable widget** for easy integration
 - 📄 **Multi-format support** (PDF, HTML, JSON)
 
 ## 🚀 Quick Start
@@ -26,36 +26,37 @@ A modern RAG (Retrieval Augmented Generation) application built with Next.js, us
 
 ### Option 1: Docker Deployment (Recommended)
 
-1. **Clone and setup:**
+1. **Clone repository:**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/suryaddede/next-js-rag
    cd next-js-rag
    ```
 
-2. **Configure environment:**
+2. **Copy environment template:**
 
    ```bash
-   # Copy the environment template
    cp .env.example .env
-
-   # Edit .env with your configuration:
-   # - Set CHROMA_URL=http://chromadb:8000
-   # - Set NODE_ENV=production
-   # - Set NEXT_PUBLIC_APP_URL to your domain
-   # - Set CHROMA_AUTH_PASSWORD to a secure password
-   # - Add your API keys:
-   #   GOOGLE_GENERATIVE_AI_API_KEY=your_actual_api_key_here
-   #   VOYAGE_AI_API_KEY=your_voyage_ai_api_key_here
    ```
 
-3. **Start the application:**
+3. **Configure environment variables:**
+
+   ```bash
+   CHROMA_URL=http://chromadb:8000
+   NODE_ENV=production
+   NEXT_PUBLIC_APP_URL=https://your-domain.com
+   CHROMA_AUTH_PASSWORD=your_secure_password_here
+   GOOGLE_GENERATIVE_AI_API_KEY=your_production_api_key_here
+   VOYAGE_AI_API_KEY=your_production_api_key_here
+   ```
+
+4. **Start the application:**
 
    ```bash
    docker compose up -d
    ```
 
-4. **Access the application:**
+5. **Access the application:**
    - 🏠 **Main Interface**: [http://localhost:3000](http://localhost:3000)
    - ⚙️ **Admin Panel**: [http://localhost:3000/admin](http://localhost:3000/admin)
    - 🎮 **Integration Demo**: [http://localhost:3000/demo](http://localhost:3000/demo)
@@ -63,102 +64,55 @@ A modern RAG (Retrieval Augmented Generation) application built with Next.js, us
 
 ### Option 2: Local Development
 
-1. **Setup environment:**
+1. **Clone repository:**
+
+   ```bash
+   git clone https://github.com/suryaddede/next-js-rag
+   cd next-js-rag
+   ```
+
+2. **Copy environment template:**
 
    ```bash
    cp .env.example .env
-   # Edit .env with your API keys and set:
-   # - CHROMA_URL=http://localhost:8000
-   # - NODE_ENV=development
-   # - Add your API keys
    ```
 
-2. **Start ChromaDB only:**
+3. **Configure environment variables:**
+
+   ```bash
+   CHROMA_URL=http://localhost:8000
+   NODE_ENV=development
+   GOOGLE_GENERATIVE_AI_API_KEY=your_google_ai_api_key_here
+   VOYAGE_AI_API_KEY=your_voyage_ai_api_key_here
+   ```
+
+4. **Start the application:**
 
    ```bash
    docker compose up -d chromadb
-   ```
-
-3. **Install and run:**
-   ```bash
    npm install
    npm run dev
    ```
 
-## 🔧 Environment Configuration
+5. **Access the application:**
+   - 🏠 **Main Interface**: [http://localhost:3000](http://localhost:3000)
+   - ⚙️ **Admin Panel**: [http://localhost:3000/admin](http://localhost:3000/admin)
+   - 🎮 **Integration Demo**: [http://localhost:3000/demo](http://localhost:3000/demo)
+   - 🗄️ **ChromaDB API**: [http://localhost:8000](http://localhost:8000)
 
-The app uses a single `.env.example` template file that can be configured for any deployment scenario.
-
-### Getting Started
-
-1. **Copy the template:**
-   ```bash
-   cp .env.example .env
-   ```
-
-2. **Configure for your deployment scenario:**
-
-#### 📋 Local Development
-```bash
-# Set these in .env:
-CHROMA_URL=http://localhost:8000
-NODE_ENV=development
-GOOGLE_GENERATIVE_AI_API_KEY=your_google_ai_api_key_here
-VOYAGE_AI_API_KEY=your_voyage_ai_api_key_here
-
-# Then run:
-docker compose up -d chromadb
-npm run dev
-```
-
-#### 🐳 Docker/Production Deployment
-```bash
-# Set these in .env:
-CHROMA_URL=http://chromadb:8000
-NODE_ENV=production
-NEXT_PUBLIC_APP_URL=https://your-domain.com
-CHROMA_AUTH_PASSWORD=your_secure_password_here
-GOOGLE_GENERATIVE_AI_API_KEY=your_production_api_key_here
-VOYAGE_AI_API_KEY=your_production_api_key_here
-
-# Then run:
-docker compose up -d
-```
-
-#### ☁️ Vercel Deployment
-```bash
-# In Vercel dashboard, add these environment variables:
-CHROMA_URL=https://your-external-chromadb-instance.com:8000
-NODE_ENV=production
-NEXT_PUBLIC_APP_URL=https://your-domain.com
-GOOGLE_GENERATIVE_AI_API_KEY=your_production_api_key_here
-VOYAGE_AI_API_KEY=your_production_api_key_here
-```
-
-### Required Environment Variables
-
-| Variable                       | Description                           | Required |
-| ------------------------------ | ------------------------------------- | -------- |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | Google AI API key for text generation | ✅ Yes   |
-| `VOYAGE_AI_API_KEY`            | Voyage AI API key for embeddings      | ✅ Yes   |
-| `CHROMA_URL`                   | ChromaDB connection URL               | ✅ Yes   |
-| `NEXT_PUBLIC_APP_URL`          | Public app URL for widgets            | ✅ Yes   |
-
-### Optional Configuration Variables
+### Adjustable Environment Variables
 
 | Variable          | Description                               | Default          |
 | ----------------- | ----------------------------------------- | ---------------- |
-| `CHUNK_SIZE`      | Maximum tokens per document chunk        | `2000`           |
-| `CHUNK_OVERLAP`   | Token overlap between chunks             | `200`            |
-| `EMBEDDING_MODEL` | Voyage AI embedding model to use         | `voyage-3-large` |
+| `CHUNK_SIZE`      | Maximum tokens per document chunk         | `2000`           |
+| `CHUNK_OVERLAP`   | Token overlap between chunks              | `200`            |
+| `EMBEDDING_MODEL` | Voyage AI embedding model to use          | `voyage-3-large` |
 
 ## 📖 How to Use
 
 ### For End Users
 
 1. **Start Chatting**: Visit [http://localhost:3000](http://localhost:3000) and start asking questions
-2. **Upload Documents**: Go to the admin panel to add documents to the knowledge base
-3. **Embed Widget**: Use the demo page to learn how to integrate the chat widget into your website
 
 ### For Administrators
 
@@ -173,6 +127,7 @@ VOYAGE_AI_API_KEY=your_production_api_key_here
    - Download and convert the content to markdown
    - Create embeddings using Voyage AI
    - Store in ChromaDB for retrieval
+5. **Embed Widget**: Use the demo page to learn how to integrate the chat widget into your website
 
 #### Supported Content Types
 
@@ -181,38 +136,6 @@ VOYAGE_AI_API_KEY=your_production_api_key_here
 | **PDF**  | Research papers, manuals, reports | Extracted using Google Gemini vision |
 | **HTML** | Web pages, documentation          | Content extracted and cleaned        |
 | **JSON** | API responses, structured data    | Parsed and formatted for questions   |
-
-### For Developers
-
-#### Project Structure
-
-```
-next-js-rag/
-├── app/                    # Next.js App Router
-│   ├── api/               # API endpoints
-│   │   ├── chat/          # Chat API with RAG
-│   │   └── admin/         # Admin API routes
-│   ├── admin/             # Admin panel pages
-│   ├── demo/              # Integration demo
-│   └── embed/             # Embeddable chat widget
-├── components/            # React components
-│   ├── ui/                # shadcn/ui components
-│   ├── admin/             # Admin panel components
-│   └── EmbeddableChatPopup.tsx  # Widget component
-├── lib/                   # Utility libraries
-│   ├── chroma-db.ts       # ChromaDB operations
-│   └── url-to-markdown.ts # Content processing
-├── public/                # Static files
-│   ├── chat-widget.js     # Embeddable widget script
-│   └── example.php        # PHP integration example
-└── docker-compose.yaml    # Docker services
-```
-
-#### Key Components
-
-- **[`ChatInterface`](components/ChatInterface.tsx)**: Main chat component using Vercel AI SDK
-- **[`DocumentModal`](components/admin/DocumentModal.tsx)**: Document upload/edit interface
-- **[`EmbeddableChatPopup`](components/EmbeddableChatPopup.tsx)**: Embeddable widget for external sites
 
 #### API Endpoints
 
@@ -224,13 +147,13 @@ next-js-rag/
 | `/api/admin/document` | PUT    | Update document                        |
 | `/api/admin/document` | DELETE | Remove document                        |
 
-## 🔗 Integration with PHP/HTML
+## 🔗 Integration with HTML
 
-This application can be embedded as a chat widget in any PHP or HTML website.
+This application can be embedded as a chat widget in any HTML website.
 
 ### Quick Integration
 
-Add this single line to your PHP page:
+Add this single line to your HTML page:
 
 ```html
 <script src="http://localhost:3000/chat-widget.js"></script>
@@ -256,8 +179,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 ### Examples
 
-- **[`public/example.php`](public/example.php)**: Complete PHP integration example
-- **[`public/integration-example.html`](public/integration-example.html)**: HTML integration example
+- **[`public/integration-example.html`](public/integration-example.html)**: Complete HTML integration example
 - **Demo Page**: [http://localhost:3000/demo](http://localhost:3000/demo) for live examples
 
 For detailed integration instructions, see [`INTEGRATION.md`](INTEGRATION.md).
@@ -326,34 +248,7 @@ graph TB
 | `nextjs-app` | 3000 | Next.js application |
 | `chromadb`   | 8000 | Vector database     |
 
-## 🚀 Deployment
-
-### Docker/Production
-
-```bash
-# Copy and configure environment
-cp .env.example .env
-# (Configure as shown in Environment Configuration section)
-
-# Start full stack
-docker compose up -d
-```
-
-### Local Development
-
-```bash
-# Copy and configure environment  
-cp .env.example .env
-# (Configure as shown in Environment Configuration section)
-
-# Start ChromaDB only
-docker compose up -d chromadb
-
-# Start Next.js dev server
-npm run dev
-```
-
-### Security Considerations
+## 🔒 Security Considerations
 
 - Set a secure `CHROMA_AUTH_PASSWORD` in production
 - Use environment-specific API keys

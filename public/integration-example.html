@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PHP Page with RAG Chat Widget</title>
+    <title>HTML Page with RAG Chat Widget</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,20 +38,20 @@
 </head>
 <body>
     <div class="container">
-        <h1>Example PHP Page</h1>
+        <h1>Example HTML Page</h1>
         <div class="content">
-            <p>This is an example of how to integrate the RAG Chat Widget into your PHP webpage.</p>
+            <p>This is an example of how to integrate the RAG Chat Widget into your HTML webpage.</p>
             
             <div class="highlight">
                 <h3>Integration Methods:</h3>
                 <ol>
-                    <li><strong>JavaScript Widget (Recommended):</strong> Add the script tag below to your PHP page</li>
+                    <li><strong>JavaScript Widget (Recommended):</strong> Add the script tag below to your HTML page</li>
                     <li><strong>iframe Method:</strong> Use direct iframe embedding for simpler integration</li>
                 </ol>
             </div>
 
             <h2>Method 1: JavaScript Widget Integration</h2>
-            <p>Add this script tag to your PHP page:</p>
+            <p>Add this script tag to your HTML page:</p>
             <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;"><code>&lt;script src="http://localhost:3000/chat-widget.js"&gt;&lt;/script&gt;</code></pre>
 
             <p>For custom configuration:</p>
@@ -74,14 +74,20 @@ window.RAGChatWidget.init({
     onload="this.style.pointerEvents='auto'"&gt;
 &lt;/iframe&gt;</code></pre>
 
-            <h2>PHP Integration Example</h2>
-            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;"><code>&lt;?php
-// Your PHP code here
-echo "&lt;h1&gt;Welcome to our website&lt;/h1&gt;";
-?&gt;
+            <h2>HTML Integration Example</h2>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;My Website&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Welcome to our website&lt;/h1&gt;
+    &lt;p&gt;Your content here...&lt;/p&gt;
 
-&lt;!-- Add the chat widget --&gt;
-&lt;script src="http://localhost:3000/chat-widget.js"&gt;&lt;/script&gt;</code></pre>
+    &lt;!-- Add the chat widget --&gt;
+    &lt;script src="http://localhost:3000/chat-widget.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
 
             <p>The chat widget will appear as a floating button in the bottom-right corner of your page. Users can click it to open the chat interface.</p>
         </div>
